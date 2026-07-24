@@ -23,33 +23,63 @@ const STORAGE_KEY = "kanbanTasks";
 
 let dragElement = null;
 
+function addTask(title, desc, column) {
+  const div = document.createElement("div");
+  div.classList.add("task");
+  div.setAttribute("draggable", "true");
+  div.innerHTML = `
+        <h3>${title}</h3>
+        <p>${desc}</p>
+        <button>Delete</button>
+    `;
+  column.appendChild(div);
+  div.addEventListener("dragstart", (event) => {
+    dragElement = div;
+  });
+
+  const deleteButton = div.querySelector("button");
+  deleteButton.addEventListener("click", (event) => {
+    div.remove();
+    updateTaskCount();
+  });
+  return div;
+}
+
+function updateTaskCount(){
+  columns.forEach((col) => {
+      const tasks = col.querySelectorAll(".task");
+      const count = col.querySelector(".right");
+
+      // Not understood
+      // update the tasksData object with the new task data for the column
+      tasksData[col.id] = Array.from(tasks).map((t) => {
+        return {
+          title: t.querySelector("h3").innerText,
+          desc: t.querySelector("p").innerText,
+        };
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasksData));
+      count.innerText = tasks.length;
+    });
+}
+
 if (localStorage.getItem(STORAGE_KEY)) {
   try {
     tasksData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; // if error will come, it will return empty object {}
   } catch (error) {
     tasksData = {};
   }
+
   for (const col in tasksData) {
     const column = document.getElementById(col);
-    // const column = document.querySelector(`#${col}`);
-    if (!column || !Array.isArray(tasksData[col])) continue;
-    tasksData[col].forEach((task) => {
-      if (!task) return;
-      const div = document.createElement("div");
-      div.classList.add("task");
-      div.setAttribute("draggable", "true");
-      div.innerHTML = `
-        <h3>${task.title}</h3>
-        <p>${task.desc}</p>
-        <button>Delete</button>
-      `;
-      column.appendChild(div);
 
-      div.addEventListener("dragstart", (event) => {
-        dragElement = div;
-      });
+    if (!column || !Array.isArray(tasksData[col])) continue;
+
+    tasksData[col].forEach((task) => {
+      addTask(task.title, task.desc, column);
     });
   }
+  updateTaskCount();
 }
 
 tasks.forEach((task) => {
@@ -80,24 +110,10 @@ function addDragEventsOnColumn(column) {
     event.preventDefault();
 
     column.appendChild(dragElement);
-
-    columns.forEach((col) => {
-      const tasks = col.querySelectorAll(".task");
-      const count = col.querySelector(".right");
-
-      // Not understood
-      // update the tasksData object with the new task data for the column
-      tasksData[col.id] = Array.from(tasks).map((t) => {
-        return {
-          title: t.querySelector("h3").innerText,
-          desc: t.querySelector("p").innerText,
-        };
-      });
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasksData));
-      count.innerText = tasks.length;
-    });
-
     column.classList.remove("hover-over");
+
+    updateTaskCount();
+
 
     // columns.forEach((col) => {
     //   const tasks = col.querySelectorAll(".task");
@@ -131,36 +147,13 @@ addNewButton.addEventListener("click", (event) => {
   const taskDesc = document.querySelector("#task-desc-input").value;
 
   // creating new task using createElement
-  const div = document.createElement("div");
-  div.classList.add("task");
-  div.setAttribute("draggable", "true");
-  div.innerHTML = `
-        <h3>${taskTitle}</h3>
-        <p>${taskDesc}</p>
-        <button>Delete</button>
-    `;
-  todo.appendChild(div);
+  addTask(taskTitle, taskDesc, todo);
   // creating new task using createElement
-
-  columns.forEach((col) => {
-    const tasks = col.querySelectorAll(".task");
-    const count = col.querySelector(".right");
-    tasksData[col.id] = Array.from(tasks).map((t) => {
-      return {
-        title: t.querySelector("h3").innerText,
-        desc: t.querySelector("p").innerText,
-      };
-    });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasksData));
-
-    count.innerText = tasks.length;
-  });
-
-  div.addEventListener("dragstart", (event) => {
-    dragElement = div;
-  });
+  updateTaskCount();
 
   modal.classList.remove("active");
+  document.querySelector("#task-title-input").value = "";
+  document.querySelector("#task-desc-input").value = "";
 });
 
 /* Modal Related Logic */
