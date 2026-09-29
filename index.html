@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Kanban Board</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -21,7 +21,8 @@
           <!-- <div draggable="true" class="task">
             <h2>Task 1</h2>
             <p>Description for Task 1</p>
-            <button>Delete</button>
+            <button class="del-btn">Delete</button>
+            <button class="edit-btn">Edit</button>
           </div> -->
         </div>
         <div id="progress" class="tasks-col">
@@ -44,6 +45,14 @@
             <input id="task-title-input" type="text" placeholder="Task Title" />
             <textarea id="task-desc-input" placeholder="Task Description"></textarea>
             <button id="add-new-task" class="add-new-btn" type="button">Add Task</button>
+        </div>
+    </div>
+    <div class="modal-edit">
+      <div class="bg-edit"></div>
+        <div class="center">
+            <input id="edit-task-title-input" type="text" placeholder="Task Title" />
+            <textarea id="edit-task-desc-input" placeholder="Task Description"></textarea>
+            <button class="edit-task-btn" type="button">Edit</button>
         </div>
     </div>
     <script src="script.js"></script>

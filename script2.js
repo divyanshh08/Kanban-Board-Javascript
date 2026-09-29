@@ -1,14 +1,50 @@
-// Notes
-// 1. whenever adding eventListener, add preventDefault() to prevent loading of page
+/* Approach
+1. Add drag and drop functionality to the task cards.
+2. Implement a modal for adding new tasks with input fields for task title and description.
+3. Store tasks in local storage to persist data across page reloads.
+4. Add the ability to delete tasks.
+5. Implement a search functionality to filter tasks based on title or description.
 
-// Approach
-// 1. drag and drop functionality
-// 2. Add count functionality to each column
-// 3. Add Modal functionality to add new task
-// 4. Local storage functionality to save tasks
+*/
 
-// Issues
-// 1. After dropping task from column 1 to column 2, the tasksData doesnt show the updated data for column 1, it shows the data for column 2 instead. This is because we are updating the tasksData object with the new task data for the column after dropping the task, but we are not updating the tasksData object for the other columns. We need to update the tasksData object for all columns after dropping a task.
+/* Note
+
+*/
+
+// const tasks = document.querySelectorAll('.task');
+// const todo = document.getElementById('todo');
+// const progress = document.getElementById('progress');
+// const done = document.getElementById('done');
+
+// function addDragEventsOnColumns(column){
+//     column.addeventListener('dragstart', (event) => {
+//         event.preventDefault();
+//         // column.classList.add('hover-over');
+//     });
+//     column.addEventListener('dragover', (event) => {
+//         event.preventDefault();
+//         column.classList.add('hover-over');
+//     });
+//     column.addEventListener('dragleave', (event) => {
+//         event.preventDefault();
+//         column.classList.remove('hover-over');
+//     });
+//     column.addEventListener('drop', (event) => {
+//         event.preventDefault();
+//         column.classList.remove('hover-over');
+//         if(dragElement){
+//             column.appendChild(dragElement);
+//             dragElement = null;
+//             updateTaskCount();
+//         }
+//     });
+// }
+
+// addDragEventsOnColumns(todo);
+// addDragEventsOnColumns(progress);
+// addDragEventsOnColumns(done);
+
+
 
 let tasksData = {};
 
@@ -24,20 +60,15 @@ let dragElement = null;
 
 function addTask(title, desc, column) {
   const div = document.createElement("div");
-  const btnDiv = document.createElement("div");
-  btnDiv.classList.add("btn-div");
-
   div.classList.add("task");
   div.setAttribute("draggable", "true");
   div.innerHTML = `
         <h3>${title}</h3>
         <p>${desc}</p>
-        <div class="btn-div">
-            <button class="edit-btn">Edit</button>
-            <button class="del-btn">Delete</button>
-        </div>
+        <button class="del-btn">Delete</button>
+        <button class="edit-btn">Edit</button>
     `;
-  column.appendChild(div); // added at the end of the column
+  column.appendChild(div);
   div.addEventListener("dragstart", (event) => {
     dragElement = div;
   });
@@ -47,39 +78,33 @@ function addTask(title, desc, column) {
     div.remove();
     updateTaskCount();
   });
+  return div;
 
-  const cardEditBtn = div.querySelector(".edit-btn");
-  cardEditBtn.addEventListener("click", () => {
-    // 1. Open the modal
-    modalEdit.classList.add("active");
+  const editButton = div.querySelector(".edit-btn");
+  editButton.addEventListener("click", (event) => {
+    modal.classList.toggle("active");
 
-    // 2. Pre-fill the input fields with the card's current text
-    document.querySelector("#edit-task-title-input").value = title;
-    document.querySelector("#edit-task-desc-input").value = desc;
-
-    // Optional: Keep track of which task card is currently being edited
-    window.currentEditingTask = div;
   });
 
-  return div;
 }
 
-function updateTaskCount() {
-  columns.forEach((col) => {
-    const tasks = col.querySelectorAll(".task");
-    const count = col.querySelector(".right");
 
-    // Not understood
-    // update the tasksData object with the new task data for the column
-    tasksData[col.id] = Array.from(tasks).map((t) => {
-      return {
-        title: t.querySelector("h3").innerText,
-        desc: t.querySelector("p").innerText,
-      };
+function updateTaskCount(){
+  columns.forEach((col) => {
+      const tasks = col.querySelectorAll(".task");
+      const count = col.querySelector(".right");
+
+      // Not understood
+      // update the tasksData object with the new task data for the column
+      tasksData[col.id] = Array.from(tasks).map((t) => {
+        return {
+          title: t.querySelector("h3").innerText,
+          desc: t.querySelector("p").innerText,
+        };
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasksData));
+      count.innerText = tasks.length;
     });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasksData));
-    count.innerText = tasks.length;
-  });
 }
 
 if (localStorage.getItem(STORAGE_KEY)) {
@@ -125,6 +150,7 @@ function addDragEventsOnColumn(column) {
 
   column.addEventListener("dragover", (event) => {
     event.preventDefault(); // enables dropping of element in column otherwise its not possible
+
   });
 
   column.addEventListener("drop", (event) => {
@@ -137,6 +163,7 @@ function addDragEventsOnColumn(column) {
     updateTaskCount();
   });
 }
+
 
 addDragEventsOnColumn(todo);
 addDragEventsOnColumn(progress);
@@ -171,33 +198,3 @@ addNewButton.addEventListener("click", (event) => {
 });
 
 /* Modal Related Logic */
-
-/* Edit button functionality */
-
-const modalEdit = document.querySelector(".modal-edit");
-const modalEditBg = document.querySelector(".modal-edit .bg-edit");
-const saveEditBtn = document.querySelector(".edit-task-btn"); // Button inside modal
-
-// Close modal when clicking the backdrop
-modalEditBg.addEventListener("click", () => {
-  modalEdit.classList.remove("active");
-});
-
-
-// Save edits when clicking the button inside the modal
-saveEditBtn.addEventListener("click", () => {
-  if (!window.currentEditingTask) return;
-
-  const newTitle = document.querySelector("#edit-task-title-input").value;
-  const newDesc = document.querySelector("#edit-task-desc-input").value;
-
-  // Update DOM text on the card
-  window.currentEditingTask.querySelector("h3").innerText = newTitle;
-  window.currentEditingTask.querySelector("p").innerText = newDesc;
-
-  // Update localStorage and close modal
-  updateTaskCount();
-  modalEdit.classList.remove("active");
-});
-
-/* Edit button functionality */

@@ -19,6 +19,8 @@ html{
     --bg-tasks-col-color: #1a1a1a;
     --bg-task-color: #2a2a2a;
     --delete-btn-color: #ff4d4d;
+    --edit-btn-color: #4d79ff;
+    --edit-modal-btn-color: #2f7e7e;
 
     /* Text colors  */
     --primary-text-color: #f4f4f4;
@@ -110,8 +112,12 @@ section .tasks-col .task{
     padding: var(--padding-sm);
     cursor: grab;
 }
-
-section .tasks-col .task button{
+section .tasks-col .task .btn-div{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+section .tasks-col .task .del-btn{
     align-self: flex-end;
     cursor: pointer;
     padding: var(--padding-sm) var(--padding-md);
@@ -121,7 +127,17 @@ section .tasks-col .task button{
     background-color: var(--delete-btn-color);
     color: var(--primary-text-color);
 }
-.modal{
+section .tasks-col .task .edit-btn{
+    background-color: var(--edit-btn-color);
+    align-self: flex-start;
+    cursor: pointer;
+    padding: var(--padding-sm) var(--padding-md);
+    border-radius: var(--border-radius-sm);
+    border: none;
+    outline: none;
+    color: var(--primary-text-color);
+}
+.modal, .modal-edit{
     position: fixed;
     z-index: 999;
     height: 100vh;
@@ -133,10 +149,14 @@ section .tasks-col .task button{
     align-items: center;
     justify-content: center;
 }
+
 .modal.active{
     display: flex;
 }
-.modal .bg{
+.modal-edit.active{
+    display: flex;
+}
+.modal .bg, .modal-edit .bg-edit{
     position: absolute;
     height: 100%;
     width: 100%;
@@ -145,7 +165,7 @@ section .tasks-col .task button{
     background-color: rgba(61, 61, 61, 0.404);
     backdrop-filter: blur(5px);
 }
-.modal .center{
+.modal .center, .modal-edit .center{
     background-color: var(--bg-button-color);
     padding: var(--padding-2xl);
     border-radius: var(--border-radius-md);
@@ -154,7 +174,10 @@ section .tasks-col .task button{
     gap: var(--padding-md);
     z-index: 10;
 }
-.modal .center input, .modal .center textarea, .modal .center select{
+.modal .center input,
+.modal .center textarea,
+.modal-edit .center input,
+.modal-edit .center textarea{
     background-color: var(--bg-task-color);
     color: var(--primary-text-color);
     border: none;
@@ -162,7 +185,7 @@ section .tasks-col .task button{
     padding: var(--padding-md);
     border-radius: var(--border-radius-sm);
 }
-.modal .center button{
+.modal .center .add-new-btn, .modal-edit .center .edit-task-btn {
     background-color: var(--bg-task-color);
     color: var(--primary-text-color);
     border: none;
@@ -173,3 +196,18 @@ section .tasks-col .task button{
     width: fit-content;
     align-self: center;
 }
+.modal .center button, .modal-edit .center button{
+    background-color: var(--edit-btn-color);
+    color: var(--primary-text-color);
+    border: none;
+    outline: none;
+    padding: var(--padding-md) var(--padding-lg);
+    cursor: pointer;
+    border-radius: var(--border-radius-md);
+    width: fit-content;
+    align-self: center;
+}
+.modal-edit .center .edit-task-btn {
+  background-color: var(--edit-modal-btn-color);
+}
+
